@@ -67,8 +67,12 @@ public class MapsActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_amis:
-                Intent intent = new Intent(this, Amis.class);
-                this.startActivity(intent);
+                Intent intenta = new Intent(this, Amis.class);
+                this.startActivity(intenta);
+                break;
+            case R.id.action_recherche:
+                Intent intentb = new Intent(this, Recherche.class);
+                this.startActivity(intentb);
                 break;
             case R.id.action_settings:
                 return true;
