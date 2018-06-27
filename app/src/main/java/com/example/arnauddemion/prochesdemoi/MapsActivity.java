@@ -3,6 +3,7 @@ package com.example.arnauddemion.prochesdemoi;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -20,6 +21,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
 
 public class MapsActivity extends AppCompatActivity
         implements
@@ -43,6 +47,7 @@ public class MapsActivity extends AppCompatActivity
     private boolean mPermissionDenied = false;
 
     private GoogleMap mMap;
+    private Circle mCircle;
     private LocationManager locationManager;
 
     @Override
@@ -98,6 +103,22 @@ public class MapsActivity extends AppCompatActivity
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
+        LatLng latLng = new LatLng(43.23, 5.43);
+        drawCircle(latLng);
+    }
+
+    private void drawCircle(LatLng latLng) {
+        for(int rad=100;rad<=500;rad+=100)
+        {
+            CircleOptions circleOptions = new CircleOptions()
+                    .center(latLng)   //set center
+                    .radius(rad)   //set radius in meters
+                    .fillColor(0x10000000)  //default
+                    .strokeColor(0x10000000)
+                    .strokeWidth(5);
+
+            mCircle = mMap.addCircle(circleOptions);
+    }
     }
 
     /**
