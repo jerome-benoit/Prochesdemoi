@@ -24,6 +24,10 @@ import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.text.DecimalFormat;
 
 public class MapsActivity extends AppCompatActivity
         implements
@@ -48,6 +52,7 @@ public class MapsActivity extends AppCompatActivity
 
     private GoogleMap mMap;
     private Circle mCircle;
+    private Marker mMarker;
     private LocationManager locationManager;
 
     @Override
@@ -103,11 +108,9 @@ public class MapsActivity extends AppCompatActivity
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
-        LatLng latLng = new LatLng(43.23, 5.43);
-        drawCircle(latLng);
     }
 
-    private void drawCircle(LatLng latLng) {
+    private void drawCircle(LatLng latLng, LatLng latLngb) {
         for(int rad=100;rad<=500;rad+=100)
         {
             CircleOptions circleOptions = new CircleOptions()
@@ -118,7 +121,33 @@ public class MapsActivity extends AppCompatActivity
                     .strokeWidth(5);
 
             mCircle = mMap.addCircle(circleOptions);
+
+            // use DecimalFormat
+            DecimalFormat decimalFormat = new DecimalFormat("#,##0.0");
+            String numberAsString = decimalFormat.format(distanceCalculation(latLng,latLngb));
+
+            mMarker = mMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title("Ami")
+                    .snippet("À " + numberAsString + " km"));
+        }
     }
+
+    public double distanceCalculation(LatLng StartP, LatLng EndP) {
+        int Radius = 6371;// radius of earth in Km
+        double lat1 = StartP.latitude;
+        double lat2 = EndP.latitude;
+        double lon1 = StartP.longitude;
+        double lon2 = EndP.longitude;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        return Radius * c;
     }
 
     /**
@@ -239,7 +268,14 @@ public class MapsActivity extends AppCompatActivity
         msg.append( "; lng : ");
         msg.append(location.getLongitude());
 
-        Toast.makeText(this, msg.toString(), Toast.LENGTH_SHORT).show();
+        /**
+         * Ajouter la récupération des coordonnées des amis et leur nom sur le serveur
+         */
+        LatLng latLng = new LatLng(43.23, 5.43);
+        LatLng latLngb = new LatLng(location.getLatitude(), location.getLongitude());
+        drawCircle(latLng, latLngb);
+
+        //Toast.makeText(this, msg.toString(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
