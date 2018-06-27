@@ -49,8 +49,12 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".Amis" />
-        <activity android:name=".Recherche"></activity>
+        <activity
+            android:name=".Amis"
+            android:label="@string/title_activity_amis" />
+        <activity
+            android:name=".Recherche"
+            android:label="@string/title_activity_recherche"/>
     </application>
 
 </manifest>

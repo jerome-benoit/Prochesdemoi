@@ -3,7 +3,6 @@ package com.example.arnauddemion.prochesdemoi;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -84,8 +83,6 @@ public class MapsActivity extends AppCompatActivity
                 Intent intentb = new Intent(this, Recherche.class);
                 this.startActivity(intentb);
                 break;
-            case R.id.action_settings:
-                return true;
         }
 
         return super.onOptionsItemSelected(item);
