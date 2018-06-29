@@ -26,7 +26,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class MapsActivity extends AppCompatActivity
         implements
@@ -107,7 +117,7 @@ public class MapsActivity extends AppCompatActivity
         enableMyLocation();
     }
 
-    private void drawCircle(LatLng latLng, LatLng latLngb) {
+    private void drawCircle(LatLng latLng, LatLng latLngb, String prenom) {
         for(int rad=100;rad<=500;rad+=100)
         {
             CircleOptions circleOptions = new CircleOptions()
@@ -125,10 +135,12 @@ public class MapsActivity extends AppCompatActivity
 
             mMarker = mMap.addMarker(new MarkerOptions()
                     .position(latLng)
-                    .title("Ami")
+                    .title(prenom)
                     .snippet("À " + numberAsString + " km"));
         }
     }
+
+
 
     public double distanceCalculation(LatLng StartP, LatLng EndP) {
         int Radius = 6371;// radius of earth in Km
@@ -227,12 +239,11 @@ public class MapsActivity extends AppCompatActivity
     public void onPause() {
         super.onPause();
 
-        //On appelle la méthode pour se désabonner
         desabonnementGPS();
     }
 
     /**
-     * Méthode permettant de s'abonner à la localisation par GPS.
+     * Method allowing to subscribe from GPS data
      */
     public void abonnementGPS() {
         //On s'abonne
@@ -250,34 +261,38 @@ public class MapsActivity extends AppCompatActivity
     }
 
     /**
-     * Méthode permettant de se désabonner de la localisation par GPS.
+     * Method allowing to unsubscribe from GPS data
      */
     public void desabonnementGPS() {
-        //Si le GPS est disponible, on s'y abonne
+        // GPS subscription if available
         locationManager.removeUpdates(this);
     }
 
     @Override
     public void onLocationChanged(final Location location) {
-        //On affiche dans un Toast la nouvelle Localisation
-        final StringBuilder msg = new StringBuilder("lat : ");
-        msg.append(location.getLatitude());
-        msg.append( "; lng : ");
-        msg.append(location.getLongitude());
+
+        LatLng latLngb = new LatLng(location.getLatitude(), location.getLongitude());
 
         /**
          * Ajouter la récupération des coordonnées des amis et leur nom sur le serveur
          */
-        LatLng latLng = new LatLng(43.23, 5.43);
-        LatLng latLngb = new LatLng(location.getLatitude(), location.getLongitude());
-        drawCircle(latLng, latLngb);
 
-        //Toast.makeText(this, msg.toString(), Toast.LENGTH_SHORT).show();
+        //LatLng latLng = new LatLng(43.23, 5.43);
+
+        ArrayList<Personne> personnes;
+        personnes = getPersonnes();
+
+        for(Personne personne : personnes) {
+            LatLng latLng = new LatLng(personne.getLatitude(), personne.getLongitude());
+
+            drawCircle(latLng, latLngb, personne.getPrenom());
+
+        }
     }
 
     @Override
     public void onProviderDisabled(final String provider) {
-        //Si le GPS est désactivé on se désabonne
+        // GPS unsubscription if deactivated
         if("gps".equals(provider)) {
             desabonnementGPS();
         }
@@ -294,6 +309,78 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public void onStatusChanged(final String provider, final int status, final Bundle extras) {
 
+    }
+
+    /**
+     * Récupère une liste de personnes.
+     * @return ArrayList<Personne>: ou autre type de données.
+     * @author François http://www.francoiscolin.fr/
+     */
+    public static ArrayList<Personne> getPersonnes() {
+
+        ArrayList<Personne> personnes = new ArrayList<Personne>();
+
+        try {
+            String myurl = "https://proches-de-moi.piment-noir.org/api/person";
+
+            URL url = new URL(myurl+"s");
+
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.connect();
+            InputStream inputStream = connection.getInputStream();
+            /*
+             * InputStreamOperations est une classe complémentaire:
+             * Elle contient une méthode InputStreamToString.
+             */
+            String result = InputStreamOperations.InputStreamToString(inputStream);
+
+            // On récupère le JSON complet
+            JSONObject jsonObject = new JSONObject(result);
+
+            // On récupère le tableau d'objets qui nous concernent
+            JSONArray array = new JSONArray(jsonObject.getString("personnes"));
+
+            // Pour tous les objets on récupère les infos
+            for (int i = 0; i < array.length(); i++) {
+                // On récupère un objet JSON du tableau
+                JSONObject obj = new JSONObject(array.getString(i));
+                // On fait le lien Personne - Objet JSON
+                Personne personne = new Personne();
+                personne.setId(obj.getInt("id"));
+                personne.setNom(obj.getString("nom"));
+                personne.setPrenom(obj.getString("prenom"));
+
+                URL urlcoord = new URL(myurl+"/"+obj.getInt("id")+"/localisation");
+                HttpsURLConnection connectioncoord = (HttpsURLConnection) urlcoord.openConnection();
+                connectioncoord.connect();
+                InputStream inputStreamcoord = connectioncoord.getInputStream();
+                /*
+                 * InputStreamOperations est une classe complémentaire:
+                 * Elle contient une méthode InputStreamToString.
+                 */
+                String resultcoord = InputStreamOperations.InputStreamToString(inputStreamcoord);
+
+                // On récupère le JSON complet
+                JSONObject jsonObjectcoord = new JSONObject(resultcoord);
+
+                // On récupère le tableau d'objets qui nous concernent
+                JSONArray arraycoord = new JSONArray(jsonObject.getString("personnes"));
+                // On récupère un objet JSON du tableau
+                JSONObject objcoord = new JSONObject(arraycoord.getString(i));
+
+                personne.setLatitude(objcoord.getDouble("latitude"));
+                personne.setLongitude(objcoord.getDouble("longitude"));
+
+                // On ajoute la personne à la liste
+                personnes.add(personne);
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // On retourne la liste des personnes
+        return personnes;
     }
 
 }
