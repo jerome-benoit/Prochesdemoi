@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -176,7 +177,7 @@ public class MapsActivity extends AppCompatActivity
 
     @Override
     public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
         return false;
@@ -321,11 +322,19 @@ public class MapsActivity extends AppCompatActivity
         ArrayList<Personne> personnes = new ArrayList<Personne>();
 
         try {
-            String myurl = "https://proches-de-moi.piment-noir.org/api/person";
+            String myurl = "https://proches-de-moi.piment-noir.org/api/person/";
+            Log.d("url", myurl);
 
-            URL url = new URL(myurl+"s");
-
-            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            URL url = new URL(myurl+"2/");
+            HttpsURLConnection connection = null;
+            connection = (HttpsURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+            // just want to do an HTTP GET here
+            connection.setRequestMethod("GET");
+            // give it 5 seconds to respond
+            connection.setReadTimeout(5*1000);
             connection.connect();
             InputStream inputStream = connection.getInputStream();
             /*
@@ -338,7 +347,7 @@ public class MapsActivity extends AppCompatActivity
             JSONObject jsonObject = new JSONObject(result);
 
             // On récupère le tableau d'objets qui nous concernent
-            JSONArray array = new JSONArray(jsonObject.getString("personnes"));
+            JSONArray array = new JSONArray(jsonObject.getString("friends"));
 
             // Pour tous les objets on récupère les infos
             for (int i = 0; i < array.length(); i++) {
@@ -349,11 +358,21 @@ public class MapsActivity extends AppCompatActivity
                 personne.setId(obj.getInt("id"));
                 personne.setNom(obj.getString("nom"));
                 personne.setPrenom(obj.getString("prenom"));
-
-                URL urlcoord = new URL(myurl+"/"+obj.getInt("id")+"/localisation");
-                HttpsURLConnection connectioncoord = (HttpsURLConnection) urlcoord.openConnection();
-                connectioncoord.connect();
-                InputStream inputStreamcoord = connectioncoord.getInputStream();
+                Log.d("InputStream", obj.getString("prenom"));
+                int persId = obj.getInt("id");
+                String persIdStr = Integer.toString(persId);
+                URL urlcoord = new URL(myurl+"/"+persIdStr+"/localisation");
+                HttpsURLConnection connectionCoord = null;
+                connectionCoord = (HttpsURLConnection) urlcoord.openConnection();
+                connectionCoord.setDoOutput(true);
+                connectionCoord.setRequestProperty("Content-Type", "application/json");
+                connectionCoord.setRequestProperty("Accept", "application/json");
+                // just want to do an HTTP GET here
+                connectionCoord.setRequestMethod("GET");
+                // give it 5 seconds to respond
+                connectionCoord.setReadTimeout(5*1000);
+                connectionCoord.connect();
+                InputStream inputStreamcoord = connectionCoord.getInputStream();
                 /*
                  * InputStreamOperations est une classe complémentaire:
                  * Elle contient une méthode InputStreamToString.
@@ -361,20 +380,22 @@ public class MapsActivity extends AppCompatActivity
                 String resultcoord = InputStreamOperations.InputStreamToString(inputStreamcoord);
 
                 // On récupère le JSON complet
-                JSONObject jsonObjectcoord = new JSONObject(resultcoord);
+                JSONObject jsonObjectCoord = new JSONObject(resultcoord);
 
                 // On récupère le tableau d'objets qui nous concernent
-                JSONArray arraycoord = new JSONArray(jsonObject.getString("personnes"));
+                JSONArray arrayCoord = new JSONArray(jsonObject.getString("localisation"));
                 // On récupère un objet JSON du tableau
-                JSONObject objcoord = new JSONObject(arraycoord.getString(i));
+                JSONObject objcoord = new JSONObject(arrayCoord.getString(i));
 
                 personne.setLatitude(objcoord.getDouble("latitude"));
                 personne.setLongitude(objcoord.getDouble("longitude"));
 
                 // On ajoute la personne à la liste
                 personnes.add(personne);
+                connectionCoord.disconnect();
 
             }
+            connection.disconnect();
 
         } catch (Exception e) {
             e.printStackTrace();
