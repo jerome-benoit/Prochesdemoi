@@ -2,17 +2,16 @@ package com.example.arnauddemion.prochesdemoi;
 
 public class Personne {
 
-    private int id;
-    private String prenom;
-    private String nom;
-    private String mail;
-    private String pass;
-    private double latitude;
-    private double longitude;
+    private Integer id;
+    private String firstname;
+    private String lastname;
+    private String email;
+    private String password;
+    private MyLocation location;
     private boolean online;
 
-    public Personne() {
-
+    Personne() {
+        location = new MyLocation();
     }
 
     public int getId() {
@@ -23,52 +22,44 @@ public class Personne {
         this.id = id;
     }
 
-    public void setPrenom(String prenom) {
-        this.prenom = prenom;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setNom(String nom) {
-        this.nom = nom;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
-    public String getNom() {
-        return nom;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public String getPrenom() {
-        return prenom;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
-    public String getMail() {
-        return mail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getPass() {
-        return pass;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPass(String pass) {
-        this.pass = pass;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public double getLatitude() {
-        return latitude;
+    public MyLocation getLocation() {
+        return location;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
+    public void setLocation(MyLocation location) {
+        this.location = location;
     }
 
     public boolean getOnline() {
@@ -78,4 +69,5 @@ public class Personne {
     public void setOnline(boolean online) {
         this.online = online;
     }
+
 }

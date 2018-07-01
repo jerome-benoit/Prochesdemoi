@@ -11,7 +11,6 @@ import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -27,17 +26,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.List;
 
-import javax.net.ssl.HttpsURLConnection;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MapsActivity extends AppCompatActivity
         implements
@@ -46,6 +42,10 @@ public class MapsActivity extends AppCompatActivity
         OnMyLocationClickListener,
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private static Retrofit retrofit = null;
+    public static final String BASE_URL = "https://proches-de-moi.piment-noir.org/";
+    private RESTService APIService;
 
     /**
      * Request code for location permission request.
@@ -65,6 +65,16 @@ public class MapsActivity extends AppCompatActivity
     private Marker mMarker;
     private LocationManager locationManager;
 
+    public void createAPI() {
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        APIService = retrofit.create(RESTService.class);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +83,9 @@ public class MapsActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        createAPI();
+        //TODO: Authenticate the user to get back the Personne instance matching the current user
     }
 
     @Override
@@ -118,7 +131,7 @@ public class MapsActivity extends AppCompatActivity
         enableMyLocation();
     }
 
-    private void drawCircle(LatLng latLng, LatLng latLngb, String prenom) {
+    private void drawCircle(LatLng latLng, LatLng latLngb, String fullname) {
         for(int rad=100;rad<=500;rad+=100)
         {
             CircleOptions circleOptions = new CircleOptions()
@@ -136,11 +149,10 @@ public class MapsActivity extends AppCompatActivity
 
             mMarker = mMap.addMarker(new MarkerOptions()
                     .position(latLng)
-                    .title(prenom)
+                    .title(fullname)
                     .snippet("À " + numberAsString + " km"));
         }
     }
-
 
 
     public double distanceCalculation(LatLng StartP, LatLng EndP) {
@@ -274,21 +286,26 @@ public class MapsActivity extends AppCompatActivity
 
         LatLng latLngb = new LatLng(location.getLatitude(), location.getLongitude());
 
-        /**
-         * Ajouter la récupération des coordonnées des amis et leur nom sur le serveur
-         */
+        Call<Friends> call = APIService.getPersonFriends(1);
 
-        //LatLng latLng = new LatLng(43.23, 5.43);
+        call.enqueue(new Callback<Friends>() {
+            @Override
+            public void onResponse(Call<Friends> call, Response<Friends> response) {
+                List<Friend> friends = response.body().getFriends();
 
-        ArrayList<Personne> personnes;
-        personnes = getPersonnes();
+                for(Friend friend : friends) {
+                    //TODO: Create personne instance from the friend id and the rest API
+                    Personne personne = new Personne();
+                    LatLng latLng = new LatLng(personne.getLocation().getLatitude(), personne.getLocation().getLongitude());
+                    drawCircle(latLng, latLngb, personne.getFirstname() + personne.getLastname());
+                }
+            }
 
-        for(Personne personne : personnes) {
-            LatLng latLng = new LatLng(personne.getLatitude(), personne.getLongitude());
+            @Override
+            public void onFailure(Call<Friends> call, Throwable throwable) {
 
-            drawCircle(latLng, latLngb, personne.getPrenom());
-
-        }
+            }
+        });
     }
 
     @Override
@@ -301,7 +318,7 @@ public class MapsActivity extends AppCompatActivity
 
     @Override
     public void onProviderEnabled(final String provider) {
-        //Si le GPS est activé on s'abonne
+        //Si le GPS est activé, on s'abonne
         if("gps".equals(provider)) {
             abonnementGPS();
         }
@@ -310,98 +327,6 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public void onStatusChanged(final String provider, final int status, final Bundle extras) {
 
-    }
-
-    /**
-     * Récupère une liste de personnes.
-     * @return ArrayList<Personne>: ou autre type de données.
-     * @author François http://www.francoiscolin.fr/
-     */
-    public static ArrayList<Personne> getPersonnes() {
-
-        ArrayList<Personne> personnes = new ArrayList<Personne>();
-
-        try {
-            String myurl = "https://proches-de-moi.piment-noir.org/api/person/";
-            Log.d("url", myurl);
-
-            URL url = new URL(myurl+"2/");
-            HttpsURLConnection connection = null;
-            connection = (HttpsURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            // just want to do an HTTP GET here
-            connection.setRequestMethod("GET");
-            // give it 5 seconds to respond
-            connection.setReadTimeout(5*1000);
-            connection.connect();
-            InputStream inputStream = connection.getInputStream();
-            /*
-             * InputStreamOperations est une classe complémentaire:
-             * Elle contient une méthode InputStreamToString.
-             */
-            String result = InputStreamOperations.InputStreamToString(inputStream);
-
-            // On récupère le JSON complet
-            JSONObject jsonObject = new JSONObject(result);
-
-            // On récupère le tableau d'objets qui nous concernent
-            JSONArray array = new JSONArray(jsonObject.getString("friends"));
-
-            // Pour tous les objets on récupère les infos
-            for (int i = 0; i < array.length(); i++) {
-                // On récupère un objet JSON du tableau
-                JSONObject obj = new JSONObject(array.getString(i));
-                // On fait le lien Personne - Objet JSON
-                Personne personne = new Personne();
-                personne.setId(obj.getInt("id"));
-                personne.setNom(obj.getString("nom"));
-                personne.setPrenom(obj.getString("prenom"));
-                Log.d("InputStream", obj.getString("prenom"));
-                int persId = obj.getInt("id");
-                String persIdStr = Integer.toString(persId);
-                URL urlcoord = new URL(myurl+"/"+persIdStr+"/localisation");
-                HttpsURLConnection connectionCoord = null;
-                connectionCoord = (HttpsURLConnection) urlcoord.openConnection();
-                connectionCoord.setDoOutput(true);
-                connectionCoord.setRequestProperty("Content-Type", "application/json");
-                connectionCoord.setRequestProperty("Accept", "application/json");
-                // just want to do an HTTP GET here
-                connectionCoord.setRequestMethod("GET");
-                // give it 5 seconds to respond
-                connectionCoord.setReadTimeout(5*1000);
-                connectionCoord.connect();
-                InputStream inputStreamcoord = connectionCoord.getInputStream();
-                /*
-                 * InputStreamOperations est une classe complémentaire:
-                 * Elle contient une méthode InputStreamToString.
-                 */
-                String resultcoord = InputStreamOperations.InputStreamToString(inputStreamcoord);
-
-                // On récupère le JSON complet
-                JSONObject jsonObjectCoord = new JSONObject(resultcoord);
-
-                // On récupère le tableau d'objets qui nous concernent
-                JSONArray arrayCoord = new JSONArray(jsonObject.getString("localisation"));
-                // On récupère un objet JSON du tableau
-                JSONObject objcoord = new JSONObject(arrayCoord.getString(i));
-
-                personne.setLatitude(objcoord.getDouble("latitude"));
-                personne.setLongitude(objcoord.getDouble("longitude"));
-
-                // On ajoute la personne à la liste
-                personnes.add(personne);
-                connectionCoord.disconnect();
-
-            }
-            connection.disconnect();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // On retourne la liste des personnes
-        return personnes;
     }
 
 }
