@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -43,8 +45,9 @@ public class MapsActivity extends AppCompatActivity
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private static Retrofit retrofit = null;
     public static final String BASE_URL = "https://proches-de-moi.piment-noir.org/";
+    private static final String TAG = "MapsActivity";
+    private static Retrofit retrofit = null;
     private RESTService APIService;
 
     /**
@@ -156,7 +159,7 @@ public class MapsActivity extends AppCompatActivity
 
 
     public double distanceCalculation(LatLng StartP, LatLng EndP) {
-        int Radius = 6371;// radius of earth in Km
+        final int Radius = 6371;// radius of earth in Km
         double lat1 = StartP.latitude;
         double lat2 = EndP.latitude;
         double lon1 = StartP.longitude;
@@ -251,7 +254,6 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public void onPause() {
         super.onPause();
-
         desabonnementGPS();
     }
 
@@ -286,24 +288,23 @@ public class MapsActivity extends AppCompatActivity
 
         LatLng latLngb = new LatLng(location.getLatitude(), location.getLongitude());
 
-        Call<Friends> call = APIService.getPersonFriends(1);
-
-        call.enqueue(new Callback<Friends>() {
+        Call<List<Friend>> call = APIService.getPersonFriends(2);
+        call.enqueue(new Callback<List<Friend>>() {
             @Override
-            public void onResponse(Call<Friends> call, Response<Friends> response) {
-                List<Friend> friends = response.body().getFriends();
-
-                for(Friend friend : friends) {
-                    //TODO: Create personne instance from the friend id and the rest API
-                    Personne personne = new Personne();
-                    LatLng latLng = new LatLng(personne.getLocation().getLatitude(), personne.getLocation().getLongitude());
-                    drawCircle(latLng, latLngb, personne.getFirstname() + personne.getLastname());
+            public void onResponse(Call<List<Friend>> call, Response<List<Friend>> response) {
+                List<Friend> friends = response.body();
+                for (Friend friend : friends) {
+                    Personne personiter = friend.getFriend();
+                    //TODO: get and set location for each friend Personne object
+                    LatLng latLng = new LatLng(personiter.getLocation().getLatitude(), personiter.getLocation().getLongitude());
+                    drawCircle(latLng, latLngb, personiter.getFirstname() + personiter.getLastname());
                 }
             }
 
             @Override
-            public void onFailure(Call<Friends> call, Throwable throwable) {
-
+            public void onFailure(Call<List<Friend>> call, Throwable throwable) {
+                Log.e(TAG, "Friends REST resource call failure");
+                Log.e(TAG, throwable.toString());
             }
         });
     }

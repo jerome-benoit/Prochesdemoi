@@ -19,7 +19,7 @@ public interface RESTService {
     Call deletPerson(@Path("id") Integer id);
 
     @PUT("api/person/{id}")
-    Call<Personne> updatePerson(@Path("id") Integer id);
+    Call<Personne> updatePerson(@Path("id") Integer id, @Body Personne person);
 
     @POST("api/person/authenticate")
     Call<Personne> authenticatePerson(@Body Personne person);
@@ -37,10 +37,10 @@ public interface RESTService {
     Call<Personne> getPerson(@Path("id") Integer id);
 
     @GET("api/person/{id}/friends")
-    Call<Friends> getPersonFriends(@Path("id") Integer id);
+    Call<List<Friend>> getPersonFriends(@Path("id") Integer id);
 
     @GET("api/person/{id}/friendswithme")
-    Call<FriendsWithMe> getPersonFriendsWithMe(@Path("id") Integer id);
+    Call<List<FriendWithMe>> getPersonFriendsWithMe(@Path("id") Integer id);
 
     @GET("api/person/{id}/localisation/fuzzy/{distance}")
     Call<MyLocation> getPersonLocation(@Path("id") Integer id, @Path("distance") Integer distance);
