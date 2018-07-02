@@ -14,6 +14,11 @@ public class Personne {
         location = new MyLocation();
     }
 
+    Personne(Integer id) {
+        this.id = id;
+        location = new MyLocation();
+    }
+
     public int getId() {
         return id;
     }
