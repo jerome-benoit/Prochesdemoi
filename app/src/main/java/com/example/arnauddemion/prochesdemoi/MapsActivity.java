@@ -26,6 +26,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -69,10 +71,13 @@ public class MapsActivity extends AppCompatActivity
     private LocationManager locationManager;
 
     public void createAPI() {
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+                .create();
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
         }
         APIService = retrofit.create(RESTService.class);
@@ -88,7 +93,6 @@ public class MapsActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
         createAPI();
-        //TODO: Authenticate the user to get back the Personne instance matching the current user
     }
 
     @Override
@@ -288,6 +292,7 @@ public class MapsActivity extends AppCompatActivity
 
         LatLng latLngb = new LatLng(location.getLatitude(), location.getLongitude());
 
+        //TODO: get the current user Personne object
         Call<List<Friend>> call = APIService.getPersonFriends(2);
         call.enqueue(new Callback<List<Friend>>() {
             @Override
@@ -295,9 +300,26 @@ public class MapsActivity extends AppCompatActivity
                 List<Friend> friends = response.body();
                 for (Friend friend : friends) {
                     Personne personiter = friend.getFriend();
-                    //TODO: get and set location for each friend Personne object
-                    LatLng latLng = new LatLng(personiter.getLocation().getLatitude(), personiter.getLocation().getLongitude());
-                    drawCircle(latLng, latLngb, personiter.getFirstname() + personiter.getLastname());
+                    Call<MyLocation> subcall = APIService.getPersonLocation(personiter.getId(), 300);
+                    subcall.enqueue(new Callback<MyLocation>() {
+                        @Override
+                        public void onResponse(Call<MyLocation> call, Response<MyLocation> response) {
+                             MyLocation currentPersonLocation = response.body();
+                             if (currentPersonLocation != null) {
+                                 personiter.setLocation(currentPersonLocation);
+                                 LatLng latLng = new LatLng(personiter.getLocation().getLatitude(), personiter.getLocation().getLongitude());
+                                 drawCircle(latLng, latLngb, personiter.getFirstname() + personiter.getLastname());
+                             } else {
+                                 Log.d(TAG, "Person " + personiter.getId() + " has no locations yet");
+                             }
+                        }
+
+                        @Override
+                        public void onFailure(Call<MyLocation> call, Throwable throwable) {
+                            Log.e(TAG, "Friend " + personiter.getId() + " localisation REST resource call failure");
+                            Log.e(TAG, throwable.toString());
+                        }
+                    });
                 }
             }
 
