@@ -165,6 +165,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
+        } else if (TextUtils.isEmpty(password)) {
+            mPasswordView.setError(getString(R.string.error_field_required));
+            focusView = mPasswordView;
+            cancel = true;
         }
 
         // Check for a valid email address.
@@ -326,7 +330,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             /**
              * Intent
              */
-            Intent myIntent = new Intent(getBaseContext(),   MapsActivity.class);
+            Intent myIntent = new Intent(getBaseContext(), MapsActivity.class);
             startActivity(myIntent);
 
             // TODO: register the new account here.
