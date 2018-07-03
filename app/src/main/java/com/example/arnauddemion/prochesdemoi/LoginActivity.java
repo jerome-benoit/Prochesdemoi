@@ -308,6 +308,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             User.setEmail(mEmail);
             User.hashPassword(mPassword);
 
+            //FIXME: Maybe do a synchronous call to the API in the authenticate method to avoid the twice login phase?
             if (User.authenticate()) {
                 /**
                  * Intent
