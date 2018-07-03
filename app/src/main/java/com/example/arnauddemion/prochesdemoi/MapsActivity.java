@@ -265,7 +265,7 @@ public class MapsActivity extends AppCompatActivity
 
         User.updateLocation(location.getLatitude(), location.getLongitude(), location.getTime());
         User.fetchFriends();
-        mMap.clear();q
+        mMap.clear();
         //TODO: move this code in a displayFriends method of CurrentUser
         for (Personne friend : User.getFriends()) {
             if (friend.getLocation() != null) {
