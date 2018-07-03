@@ -1,5 +1,6 @@
 package com.example.arnauddemion.prochesdemoi;
 
+import android.app.ListActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,11 +11,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
-public class Amis extends AppCompatActivity {
+public class Amis extends ListActivity {
     private final String TAG = getClass().getSimpleName();
     CurrentUser User = CurrentUser.getInstance();
 
-    private ListView mListView;
     private ArrayList<String> persons;
 
     /**
@@ -28,16 +28,20 @@ public class Amis extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_amis);
 
+        persons = new ArrayList<String>();
+
         User.fetchFriends();
         //TODO: move this code in a displayFriends method of CurrentUser
+        //TODO: create a button unfriend for each friend
         for (Personne friend : User.getFriends()) {
-            persons.add(friend.getFirstname());
-            //friend.getLastname();
+            persons.add(friend.getFirstname() + " " + friend.getLastname());
         }
 
-        mListView = (ListView) findViewById(R.id.listView);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(Amis.this,
-                android.R.layout.simple_list_item_1, persons);
-        mListView.setAdapter(adapter);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_list_item_1,
+                persons);
+
+        setListAdapter(adapter);
     }
 }
