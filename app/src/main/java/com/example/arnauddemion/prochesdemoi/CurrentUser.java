@@ -43,8 +43,15 @@ class CurrentUser extends Personne {
         }
         //FIXME: Make use of a salt
         md.reset();
-        String hashedPassword = md.digest(password.getBytes()).toString();
-        Log.d(TAG, "Password: " + password + " , hashed password: " + hashedPassword);
+        byte[] hashedPasswordBytes = md.digest(password.getBytes());
+        //Convert it to hexadecimal format
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < hashedPasswordBytes.length; i++)
+        {
+            sb.append(Integer.toString((hashedPasswordBytes[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        String hashedPassword = sb.toString();
+        Log.d(TAG, "Password: " + password + ", hashed password: " + hashedPassword);
         setPassword(hashedPassword);
     }
 
@@ -61,7 +68,7 @@ class CurrentUser extends Personne {
                     setId(user.getId());
                     setFirstname(user.getFirstname());
                     setLastname(user.getLastname());
-                    putOnline();
+                    //putOnline();
                     rtVal = true;
                 }
             }
