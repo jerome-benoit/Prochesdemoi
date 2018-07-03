@@ -8,6 +8,16 @@ public class MyLocation {
     private double latitude;
     private double longitude;
 
+    MyLocation() {
+
+    }
+
+    MyLocation(double latitude, double longitude, Date timestamp) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.timestamp = timestamp;
+    }
+
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }

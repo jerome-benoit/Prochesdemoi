@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DecimalFormat;
+import java.sql.Date;
 
 public class MapsActivity extends AppCompatActivity
         implements
@@ -264,6 +265,7 @@ public class MapsActivity extends AppCompatActivity
     public void onLocationChanged(final Location location) {
         LatLng latLngb = new LatLng(location.getLatitude(), location.getLongitude());
 
+        User.updateLocation(location.getLatitude(), location.getLongitude(), location.getTime());
         User.fetchFriends();
         //TODO: move this code in a displayFriends method of CurrentUser
         for (Personne friend : User.getFriends()) {

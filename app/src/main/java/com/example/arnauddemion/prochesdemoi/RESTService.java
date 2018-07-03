@@ -2,6 +2,7 @@ package com.example.arnauddemion.prochesdemoi;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -25,13 +26,13 @@ public interface RESTService {
     Call<Personne> authenticatePerson(@Body Personne person);
 
     @POST("api/person/{id}/localisation")
-    Call updatePersonLocation(@Body MyLocation location);
+    Call<ResponseBody> updatePersonLocation(@Path("id") Integer id, @Body MyLocation location);
 
     @PUT("api/person/{id}/online")
-    Call setPersonOnline(@Path("id") Integer id);
+    Call<ResponseBody> setPersonOnline(@Path("id") Integer id);
 
     @PUT("api/person/{id}/offline")
-    Call setPersonOffline(@Path("id") Integer id);
+    Call<ResponseBody> setPersonOffline(@Path("id") Integer id);
 
     @GET("api/person/{id}")
     Call<Personne> getPerson(@Path("id") Integer id);

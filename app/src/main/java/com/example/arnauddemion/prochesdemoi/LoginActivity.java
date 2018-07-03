@@ -315,20 +315,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             User.setEmail(mEmail);
             User.hashPassword(mPassword);
 
-            /*try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }*/
             if (User.authenticate()) {
                 /**
                  * Intent
@@ -336,7 +322,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Intent myIntent = new Intent(getBaseContext(), MapsActivity.class);
                 startActivity(myIntent);
 
-                // TODO: register the new account here.
                 return true;
             } else {
                 return false;

@@ -5,8 +5,12 @@ import android.util.Log;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -68,7 +72,7 @@ class CurrentUser extends Personne {
                     setId(user.getId());
                     setFirstname(user.getFirstname());
                     setLastname(user.getLastname());
-                    //putOnline();
+                    putOnline();
                     rtVal = true;
                 }
             }
@@ -83,19 +87,42 @@ class CurrentUser extends Personne {
         return rtVal;
     }
 
-    public void updateLocation() {
+    private Date timestampToDate(long timestamp){
+        try {
+            return new Date(timestamp);
+        }
+        catch (Exception ex) {
+            Log.d(TAG, "");
+            return null;
+        }
+    }
+    
+    public void updateLocation(double latitude, double longitude, long timestamp) {
+        MyLocation location = new MyLocation(latitude, longitude, timestampToDate(timestamp));
+        Call<ResponseBody> call = APIService.updatePersonLocation(getId(), location);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                Log.e(TAG, "Set person " + getId() + " location REST resource call failure");
+                Log.e(TAG, throwable.toString());
+            }
+        });
 
     }
 
     public void putOnline() {
-        Call call = APIService.setPersonOnline(getId());
-        call.enqueue(new Callback() {
+        Call<ResponseBody> call = APIService.setPersonOnline(getId());
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call call, Response response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
             }
 
             @Override
-            public void onFailure(Call call, Throwable throwable) {
+            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
                 Log.e(TAG, "Set person " + getId() + " online REST resource call failure");
                 Log.e(TAG, throwable.toString());
             }
@@ -103,14 +130,14 @@ class CurrentUser extends Personne {
     }
 
     public void putOffline() {
-        Call call = APIService.setPersonOffline(getId());
-        call.enqueue(new Callback() {
+        Call<ResponseBody> call = APIService.setPersonOffline(getId());
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call call, Response response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
             }
 
             @Override
-            public void onFailure(Call call, Throwable throwable) {
+            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
                 Log.e(TAG, "Set person " + getId() + " offline REST resource call failure");
                 Log.e(TAG, throwable.toString());
             }
@@ -136,7 +163,9 @@ class CurrentUser extends Personne {
                                 } else {
                                     Log.d(TAG, "Person " + personiter.getId() + " has no location(s) yet");
                                 }
-                                friends.add(personiter);
+                                if (!friends.contains(personiter)) {
+                                    friends.add(personiter);
+                                }
                             }
 
                             @Override
