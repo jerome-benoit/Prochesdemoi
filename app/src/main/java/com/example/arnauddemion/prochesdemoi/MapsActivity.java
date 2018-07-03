@@ -269,7 +269,7 @@ public class MapsActivity extends AppCompatActivity
         for (Personne friend : User.getFriends()) {
             if (friend.getLocation() != null) {
                 LatLng latLng = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
-                drawCircle(latLng, latLngb, friend.getFirstname() + friend.getLastname());
+                drawCircle(latLng, latLngb, friend.getFirstname() + " " + friend.getLastname());
             } else {
                 Log.d(TAG, "Friend " + friend.getId() + " has no location(s) yet, not displaying");
             }
