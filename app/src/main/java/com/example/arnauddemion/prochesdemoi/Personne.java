@@ -43,6 +43,10 @@ public class Personne {
         this.firstname = firstname;
     }
 
+    public String getFullname() {
+        return firstname + " " + lastname;
+    }
+
     public String getEmail() {
         return email;
     }

@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
@@ -39,6 +40,9 @@ public class MapsActivity extends AppCompatActivity
     private final String TAG = getClass().getSimpleName();
     CurrentUser User = CurrentUser.getInstance();
 
+    private final int mInterval = 6000; // 6 seconds by default, can be changed later
+    private Handler mHandler;
+
     /**
      * Request code for location permission request.
      *
@@ -57,6 +61,43 @@ public class MapsActivity extends AppCompatActivity
     private Marker mMarker;
     private LocationManager locationManager;
 
+    private Runnable mStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                updateFriendsLocation(); //this function can change value of mInterval.
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                mHandler.postDelayed(mStatusChecker, mInterval);
+            }
+        }
+    };
+
+    private void startRepeatingTask() {
+        mStatusChecker.run();
+    }
+
+    private void stopRepeatingTask() {
+        mHandler.removeCallbacks(mStatusChecker);
+    }
+
+    private void updateFriendsLocation() {
+        User.fetchFriends();
+        if (mMap != null) {
+            mMap.clear();
+            //TODO: move this code in a displayFriends method of CurrentUser
+            for (Personne friend : User.getFriends()) {
+                if (friend.getLocation() != null) {
+                    LatLng latLng = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
+                    drawCircle(latLng, User.getLocationLatLng(), friend.getFullname());
+                } else {
+                    Log.d(TAG, "Friend " + friend.getId() + " has no location(s) yet, not displaying");
+                }
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +106,15 @@ public class MapsActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        mHandler = new Handler();
+        startRepeatingTask();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopRepeatingTask();
+        User.putOffline();
     }
 
     @Override
@@ -124,31 +174,13 @@ public class MapsActivity extends AppCompatActivity
 
             // use DecimalFormat
             DecimalFormat decimalFormat = new DecimalFormat("#,##0.0");
-            String numberAsString = decimalFormat.format(distanceCalculation(latLng,latLngb));
+            String numberAsString = decimalFormat.format(User.distanceCalculation(latLng,latLngb));
 
             mMarker = mMap.addMarker(new MarkerOptions()
                     .position(latLng)
                     .title(fullname)
                     .snippet("À " + numberAsString + " km"));
         }
-    }
-
-
-    public double distanceCalculation(LatLng StartP, LatLng EndP) {
-        final int Radius = 6371;// radius of earth in Km
-        double lat1 = StartP.latitude;
-        double lat2 = EndP.latitude;
-        double lon1 = StartP.longitude;
-        double lon2 = EndP.longitude;
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1))
-                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
-                * Math.sin(dLon / 2);
-        double c = 2 * Math.asin(Math.sqrt(a));
-
-        return Radius * c;
     }
 
     /**
@@ -261,20 +293,7 @@ public class MapsActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(final Location location) {
-        LatLng latLngb = new LatLng(location.getLatitude(), location.getLongitude());
-
         User.updateLocation(location.getLatitude(), location.getLongitude(), location.getTime());
-        User.fetchFriends();
-        mMap.clear();
-        //TODO: move this code in a displayFriends method of CurrentUser
-        for (Personne friend : User.getFriends()) {
-            if (friend.getLocation() != null) {
-                LatLng latLng = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
-                drawCircle(latLng, latLngb, friend.getFirstname() + " " + friend.getLastname());
-            } else {
-                Log.d(TAG, "Friend " + friend.getId() + " has no location(s) yet, not displaying");
-            }
-        }
     }
 
     @Override

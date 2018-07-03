@@ -24,7 +24,7 @@ public class Amis extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_amis);
 
-        ListView myList=(ListView)findViewById(android.R.id.list);
+        ListView myList = findViewById(android.R.id.list);
 
         persons = new ArrayList<String>();
 
@@ -32,7 +32,7 @@ public class Amis extends Activity {
         //TODO: move this code in a displayFriends method of CurrentUser
         //TODO: create a button unfriend for each friend
         for (Personne friend : User.getFriends()) {
-            persons.add(friend.getFirstname() + " " + friend.getLastname());
+            persons.add(friend.getFullname());
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(

@@ -2,6 +2,8 @@ package com.example.arnauddemion.prochesdemoi;
 
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
@@ -36,10 +38,13 @@ class CurrentUser extends Personne {
 
     public List<Personne> getPersons() {
         for (Personne personne : persons) {
+            Log.d(TAG, "Personne: " + personne.getId() + " " + personne.getFullname());
+        }
+        /*for (Personne personne : persons) {
             if (getId() == personne.getId()) {
                 persons.remove(personne);
             }
-        }
+        }*/
         return persons;
     }
 
@@ -52,8 +57,29 @@ class CurrentUser extends Personne {
         return friends;
     }
 
+    public LatLng getLocationLatLng() {
+        return new LatLng(getLocation().getLatitude(), getLocation().getLongitude());
+    }
+
     public static Integer getFuzzyDistance() {
         return fuzzyDistance;
+    }
+
+    public double distanceCalculation(LatLng StartP, LatLng EndP) {
+        final int Radius = 6371;// radius of earth in Km
+        double lat1 = StartP.latitude;
+        double lat2 = EndP.latitude;
+        double lon1 = StartP.longitude;
+        double lon2 = EndP.longitude;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        return Radius * c;
     }
 
     public void hashPassword(String password) {
@@ -69,9 +95,8 @@ class CurrentUser extends Personne {
         byte[] hashedPasswordBytes = md.digest(password.getBytes());
         //Convert it to hexadecimal format
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < hashedPasswordBytes.length; i++)
-        {
-            sb.append(Integer.toString((hashedPasswordBytes[i] & 0xff) + 0x100, 16).substring(1));
+        for (byte hashedPasswordByte : hashedPasswordBytes) {
+            sb.append(Integer.toString((hashedPasswordByte & 0xff) + 0x100, 16).substring(1));
         }
         String hashedPassword = sb.toString();
         Log.d(TAG, "Password: " + password + ", hashed password: " + hashedPassword);
@@ -107,18 +132,12 @@ class CurrentUser extends Personne {
     }
 
     private Date timestampToDate(long timestamp){
-        try {
-            return new Date(timestamp);
-        }
-        catch (Exception ex) {
-            Log.d(TAG, "");
-            return null;
-        }
+        return new Date(timestamp);
     }
     
     public void updateLocation(double latitude, double longitude, long timestamp) {
-        MyLocation location = new MyLocation(latitude, longitude, timestampToDate(timestamp));
-        Call<ResponseBody> call = APIService.updatePersonLocation(getId(), location);
+        setLocation(new MyLocation(latitude, longitude, timestampToDate(timestamp)));
+        Call<ResponseBody> call = APIService.updatePersonLocation(getId(), getLocation());
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
