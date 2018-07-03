@@ -40,6 +40,9 @@ public interface RESTService {
     @GET("api/person/{id}/friends")
     Call<List<Friend>> getPersonFriends(@Path("id") Integer id);
 
+    @GET("api/persons")
+    Call<List<Personne>> getPersons();
+
     @GET("api/person/{id}/friendswithme")
     Call<List<FriendWithMe>> getPersonFriendsWithMe(@Path("id") Integer id);
 

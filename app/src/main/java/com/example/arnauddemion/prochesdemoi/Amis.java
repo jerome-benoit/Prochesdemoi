@@ -1,17 +1,13 @@
 package com.example.arnauddemion.prochesdemoi;
 
-import android.app.ListActivity;
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import java.util.ArrayList;
 
-public class Amis extends ListActivity {
+public class Amis extends Activity {
     private final String TAG = getClass().getSimpleName();
     CurrentUser User = CurrentUser.getInstance();
 
@@ -28,6 +24,8 @@ public class Amis extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_amis);
 
+        ListView myList=(ListView)findViewById(android.R.id.list);
+
         persons = new ArrayList<String>();
 
         User.fetchFriends();
@@ -42,6 +40,6 @@ public class Amis extends ListActivity {
                 android.R.layout.simple_list_item_1,
                 persons);
 
-        setListAdapter(adapter);
+        myList.setAdapter(adapter);
     }
 }

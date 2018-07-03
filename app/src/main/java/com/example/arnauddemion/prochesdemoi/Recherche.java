@@ -1,17 +1,13 @@
 package com.example.arnauddemion.prochesdemoi;
 
-import android.app.ListActivity;
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import java.util.ArrayList;
 
-public class Recherche extends ListActivity {
+public class Recherche extends Activity {
     private final String TAG = getClass().getSimpleName();
     CurrentUser User = CurrentUser.getInstance();
 
@@ -26,15 +22,17 @@ public class Recherche extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_amis);
+        setContentView(R.layout.activity_recherche);
+
+        ListView myList=(ListView)findViewById(android.R.id.list);
 
         persons = new ArrayList<String>();
 
-        User.fetchFriends();
+        User.fetchPersons();
         //TODO: move this code in a displayFriends method of CurrentUser
         //TODO: create a button add for each friend
-        for (Personne friend : User.getFriends()) {
-            persons.add(friend.getFirstname() + " " + friend.getLastname());
+        for (Personne personne : User.getPersons()) {
+            persons.add(personne.getFirstname() + " " + personne.getLastname());
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -42,6 +40,6 @@ public class Recherche extends ListActivity {
                 android.R.layout.simple_list_item_1,
                 persons);
 
-        setListAdapter(adapter);
+        myList.setAdapter(adapter);
     }
 }
