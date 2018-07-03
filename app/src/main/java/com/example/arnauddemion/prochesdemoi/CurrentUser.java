@@ -2,8 +2,8 @@ package com.example.arnauddemion.prochesdemoi;
 
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
-
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +18,9 @@ class CurrentUser extends Personne {
     private RESTService APIService = RetrofitClient.getInstance().getAPI();
     private List<Personne> friends;
 
+    // Boolean variable for tricky method that need boolean return value.
+    private static boolean rtVal;
+
     static CurrentUser getInstance() {
         return ourInstance;
     }
@@ -30,8 +33,81 @@ class CurrentUser extends Personne {
         return friends;
     }
 
-    public void authenticate() {
+    public void hashPassword(String password) {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        }
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        //FIXME: Make use of a salt
+        md.reset();
+        String hashedPassword = md.digest(password.getBytes()).toString();
+        Log.d(TAG, "Password: " + password + " , hashed password: " + hashedPassword);
+        setPassword(hashedPassword);
+    }
 
+    public boolean authenticate() {
+        Call<Personne> call = APIService.authenticatePerson(ourInstance);
+        call.enqueue(new Callback<Personne>() {
+            @Override
+            public void onResponse(Call<Personne> call, Response<Personne> response) {
+                if (response.code() == 401) {
+                    Log.d(TAG, "Authentication failure");
+                    rtVal = false;
+                } else {
+                    Personne user = response.body();
+                    setId(user.getId());
+                    setFirstname(user.getFirstname());
+                    setLastname(user.getLastname());
+                    putOnline();
+                    rtVal = true;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Personne> call, Throwable throwable) {
+                Log.e(TAG, "Authentication REST resource call failure");
+                Log.e(TAG, throwable.toString());
+                rtVal = false;
+            }
+        });
+        return rtVal;
+    }
+
+    public void updateLocation() {
+
+    }
+
+    public void putOnline() {
+        Call call = APIService.setPersonOnline(getId());
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable throwable) {
+                Log.e(TAG, "Set person " + getId() + " online REST resource call failure");
+                Log.e(TAG, throwable.toString());
+            }
+        });
+    }
+
+    public void putOffline() {
+        Call call = APIService.setPersonOffline(getId());
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable throwable) {
+                Log.e(TAG, "Set person " + getId() + " offline REST resource call failure");
+                Log.e(TAG, throwable.toString());
+            }
+        });
     }
 
     public void fetchFriends() {
@@ -74,8 +150,6 @@ class CurrentUser extends Personne {
                 Log.e(TAG, throwable.toString());
             }
         });
-
     }
-
 
 }

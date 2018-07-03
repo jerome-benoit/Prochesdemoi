@@ -264,8 +264,6 @@ public class MapsActivity extends AppCompatActivity
     public void onLocationChanged(final Location location) {
         LatLng latLngb = new LatLng(location.getLatitude(), location.getLongitude());
 
-        //TODO: get the current user Personne id
-        User.setId(2);
         User.fetchFriends();
         //TODO: move this code in a displayFriends method of CurrentUser
         for (Personne friend : User.getFriends()) {
