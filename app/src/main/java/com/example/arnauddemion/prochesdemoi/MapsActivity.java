@@ -26,18 +26,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MapsActivity extends AppCompatActivity
         implements
@@ -46,11 +36,8 @@ public class MapsActivity extends AppCompatActivity
         OnMyLocationClickListener,
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
-
-    public static final String BASE_URL = "https://proches-de-moi.piment-noir.org/";
-    private static final String TAG = "MapsActivity";
-    private static Retrofit retrofit = null;
-    private RESTService APIService;
+    private final String TAG = getClass().getSimpleName();
+    CurrentUser User = CurrentUser.getInstance();
 
     /**
      * Request code for location permission request.
@@ -70,19 +57,6 @@ public class MapsActivity extends AppCompatActivity
     private Marker mMarker;
     private LocationManager locationManager;
 
-    public void createAPI() {
-        Gson gson = new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
-                .create();
-        if (retrofit == null) {
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .build();
-        }
-        APIService = retrofit.create(RESTService.class);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,7 +66,6 @@ public class MapsActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        createAPI();
     }
 
     @Override
@@ -289,46 +262,18 @@ public class MapsActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(final Location location) {
-
         LatLng latLngb = new LatLng(location.getLatitude(), location.getLongitude());
 
-        //TODO: get the current user Personne object
-        Call<List<Friend>> call = APIService.getPersonFriends(2);
-        call.enqueue(new Callback<List<Friend>>() {
-            @Override
-            public void onResponse(Call<List<Friend>> call, Response<List<Friend>> response) {
-                List<Friend> friends = response.body();
-                for (Friend friend : friends) {
-                    Personne personiter = friend.getFriend();
-                    Call<MyLocation> subcall = APIService.getPersonLocation(personiter.getId(), 300);
-                    subcall.enqueue(new Callback<MyLocation>() {
-                        @Override
-                        public void onResponse(Call<MyLocation> call, Response<MyLocation> response) {
-                             MyLocation currentPersonLocation = response.body();
-                             if (currentPersonLocation != null) {
-                                 personiter.setLocation(currentPersonLocation);
-                                 LatLng latLng = new LatLng(personiter.getLocation().getLatitude(), personiter.getLocation().getLongitude());
-                                 drawCircle(latLng, latLngb, personiter.getFirstname() + personiter.getLastname());
-                             } else {
-                                 Log.d(TAG, "Person " + personiter.getId() + " has no locations yet");
-                             }
-                        }
-
-                        @Override
-                        public void onFailure(Call<MyLocation> call, Throwable throwable) {
-                            Log.e(TAG, "Friend " + personiter.getId() + " localisation REST resource call failure");
-                            Log.e(TAG, throwable.toString());
-                        }
-                    });
-                }
+        User.fetchFriends();
+        //TODO: move this code in a displayFriends method of CurrentUser
+        for (Personne friend : User.getFriends()) {
+            if (friend.getLocation() != null) {
+                LatLng latLng = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
+                drawCircle(latLng, latLngb, friend.getFirstname() + friend.getLastname());
+            } else {
+                Log.d(TAG, "Friend " + friend.getId() + " has no location(s) yet, not displaying");
             }
-
-            @Override
-            public void onFailure(Call<List<Friend>> call, Throwable throwable) {
-                Log.e(TAG, "Friends REST resource call failure");
-                Log.e(TAG, throwable.toString());
-            }
-        });
+        }
     }
 
     @Override
