@@ -4,11 +4,9 @@ import android.util.Log;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.sql.Date;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -42,7 +40,7 @@ class CurrentUser extends Personne {
     public List<Personne> getPersons() {
         for (Personne personne : persons) {
             if (getId() == personne.getId()) {
-            persons.remove(personne);
+                persons.remove(personne);
             }
         }
         return persons;
@@ -162,6 +160,7 @@ class CurrentUser extends Personne {
             public void onResponse(Call<List<Friend>> call, Response<List<Friend>> response) {
                 List<Friend> friendList = response.body();
                 if (friendList != null) {
+                    friends.clear();
                     for (Friend friend : friendList) {
                         Personne personiter = friend.getFriend();
                         Call<MyLocation> subcall = APIService.getPersonLocation(personiter.getId(), fuzzyDistance);
@@ -174,9 +173,7 @@ class CurrentUser extends Personne {
                                 } else {
                                     Log.d(TAG, "Person " + personiter.getId() + " has no location(s) yet");
                                 }
-                                if (!friends.contains(personiter)) {
-                                    friends.add(personiter);
-                                }
+                                friends.add(personiter);
                             }
 
                             @Override
@@ -214,5 +211,4 @@ class CurrentUser extends Personne {
             }
         });
     }
-
 }
