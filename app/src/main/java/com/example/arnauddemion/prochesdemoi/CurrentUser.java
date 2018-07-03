@@ -37,9 +37,6 @@ class CurrentUser extends Personne {
     }
 
     public List<Personne> getPersons() {
-        for (Personne personne : persons) {
-            Log.d(TAG, "Personne: " + personne.getId() + " " + personne.getFullname());
-        }
         /*for (Personne personne : persons) {
             if (getId() == personne.getId()) {
                 persons.remove(personne);
@@ -55,10 +52,6 @@ class CurrentUser extends Personne {
     public List<Personne> getNearFriends() {
         //TODO: Add time criterion?
         return friends;
-    }
-
-    public LatLng getLocationLatLng() {
-        return new LatLng(getLocation().getLatitude(), getLocation().getLongitude());
     }
 
     public static Integer getFuzzyDistance() {

@@ -40,7 +40,7 @@ public class MapsActivity extends AppCompatActivity
     private final String TAG = getClass().getSimpleName();
     CurrentUser User = CurrentUser.getInstance();
 
-    private final int mInterval = 6000; // 6 seconds by default, can be changed later
+    private final int mInterval = 6000; // 6 seconds by default, can be changed later. Should be a little randomized.
     private Handler mHandler;
 
     /**

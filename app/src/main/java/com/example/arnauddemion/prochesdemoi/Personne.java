@@ -1,5 +1,7 @@
 package com.example.arnauddemion.prochesdemoi;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Personne {
 
     private Integer id;
@@ -65,6 +67,10 @@ public class Personne {
 
     public MyLocation getLocation() {
         return location;
+    }
+
+    public LatLng getLocationLatLng() {
+        return new LatLng(getLocation().getLatitude(), getLocation().getLongitude());
     }
 
     public void setLocation(MyLocation location) {
