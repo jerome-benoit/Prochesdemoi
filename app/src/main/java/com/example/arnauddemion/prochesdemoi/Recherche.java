@@ -24,15 +24,14 @@ public class Recherche extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recherche);
 
-        ListView myList=(ListView)findViewById(android.R.id.list);
+        ListView myList = findViewById(android.R.id.list);
 
         persons = new ArrayList<String>();
 
         User.fetchPersons();
-        //TODO: move this code in a displayFriends method of CurrentUser
         //TODO: create a button add for each friend
         for (Personne personne : User.getPersons()) {
-            persons.add(personne.getFirstname() + " " + personne.getLastname());
+            persons.add(personne.getFullname());
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
