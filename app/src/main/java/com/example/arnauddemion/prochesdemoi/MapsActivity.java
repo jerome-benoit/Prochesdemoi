@@ -28,7 +28,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DecimalFormat;
-import java.sql.Date;
 
 public class MapsActivity extends AppCompatActivity
         implements
@@ -66,7 +65,6 @@ public class MapsActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
     }
 
     @Override
@@ -113,7 +111,7 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void drawCircle(LatLng latLng, LatLng latLngb, String fullname) {
-        for(int rad=100;rad<=500;rad+=100)
+        for(int rad=100;rad<=User.getFuzzyDistance();rad+=100)
         {
             CircleOptions circleOptions = new CircleOptions()
                     .center(latLng)   //set center
@@ -267,6 +265,7 @@ public class MapsActivity extends AppCompatActivity
 
         User.updateLocation(location.getLatitude(), location.getLongitude(), location.getTime());
         User.fetchFriends();
+        mMap.clear();q
         //TODO: move this code in a displayFriends method of CurrentUser
         for (Personne friend : User.getFriends()) {
             if (friend.getLocation() != null) {

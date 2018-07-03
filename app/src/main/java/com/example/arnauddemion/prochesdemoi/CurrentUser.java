@@ -16,6 +16,7 @@ import retrofit2.Response;
 class CurrentUser extends Personne {
     private static final CurrentUser ourInstance = new CurrentUser();
     private static final Integer fuzzyDistance = 300;
+    private static final Integer nearDistance= 2000;
     private final String TAG = getClass().getSimpleName();
     private RESTService APIService = RetrofitClient.getInstance().getAPI();
     private List<Personne> friends;
@@ -33,10 +34,6 @@ class CurrentUser extends Personne {
         persons = new ArrayList<>();
     }
 
-    public List<Personne> getFriends() {
-        return friends;
-    }
-
     public List<Personne> getPersons() {
         for (Personne personne : persons) {
             if (getId() == personne.getId()) {
@@ -44,6 +41,19 @@ class CurrentUser extends Personne {
             }
         }
         return persons;
+    }
+
+    public List<Personne> getFriends() {
+        return friends;
+    }
+
+    public List<Personne> getNearFriends() {
+        //TODO: Add time criterion?
+        return friends;
+    }
+
+    public static Integer getFuzzyDistance() {
+        return fuzzyDistance;
     }
 
     public void hashPassword(String password) {
