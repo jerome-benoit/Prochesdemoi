@@ -24,7 +24,7 @@ class CurrentUser extends Personne {
     private List<Personne> friends;
     private List<Personne> persons;
 
-    // Boolean variable for tricky method that need boolean return value.
+    // Boolean private variable for tricky method that need boolean return value.
     private static boolean rtVal;
 
     static CurrentUser getInstance() {
@@ -37,6 +37,7 @@ class CurrentUser extends Personne {
     }
 
     public List<Personne> getPersons() {
+        //FIXME: this loop that should filter the current logged user delete everybody.
         /*for (Personne personne : persons) {
             if (getId() == personne.getId()) {
                 persons.remove(personne);
