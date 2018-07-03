@@ -17,6 +17,7 @@ class CurrentUser extends Personne {
     private final String TAG = getClass().getSimpleName();
     private RESTService APIService = RetrofitClient.getInstance().getAPI();
     private List<Personne> friends;
+    private List<Personne> persons;
 
     // Boolean variable for tricky method that need boolean return value.
     private static boolean rtVal;
@@ -27,10 +28,20 @@ class CurrentUser extends Personne {
 
     private CurrentUser() {
         friends = new ArrayList<>();
+        persons = new ArrayList<>();
     }
 
     public List<Personne> getFriends() {
         return friends;
+    }
+
+    public List<Personne> getPersons() {
+        for (Personne personne : persons) {
+            if (getId() == personne.getId()) {
+            persons.remove(personne);
+            }
+        }
+        return persons;
     }
 
     public void hashPassword(String password) {
@@ -154,6 +165,22 @@ class CurrentUser extends Personne {
             @Override
             public void onFailure(Call<List<Friend>> call, Throwable throwable) {
                 Log.e(TAG, "Friends for person " + getId() + " REST resource call failure");
+                Log.e(TAG, throwable.toString());
+            }
+        });
+    }
+
+    public void fetchPersons() {
+        Call<List<Personne>> call = APIService.getPersons();
+        call.enqueue(new Callback<List<Personne>>() {
+            @Override
+            public void onResponse(Call<List<Personne>> call, Response<List<Personne>> response) {
+                persons = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<List<Personne>> call, Throwable throwable) {
+                Log.e(TAG, "All persons for person " + getId() + " REST resource call failure");
                 Log.e(TAG, throwable.toString());
             }
         });
