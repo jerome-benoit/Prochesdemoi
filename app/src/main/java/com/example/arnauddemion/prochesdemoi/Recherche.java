@@ -42,7 +42,6 @@ public class Recherche extends AppCompatActivity {
         adapter = new ArrayAdapter<String>(this, R.layout.list_item, R.id.friend_name, persons);
 
         User.fetchPersons();
-        //TODO: move this code in a displayFriends method of CurrentUser
         //TODO: create a button unfriend for each friend
         if (User.getPersons() != null) {
             for (Personne personne : User.getPersons()) {
