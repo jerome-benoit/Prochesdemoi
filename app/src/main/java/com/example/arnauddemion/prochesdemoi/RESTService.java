@@ -10,6 +10,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface RESTService {
 
@@ -42,6 +43,9 @@ public interface RESTService {
 
     @GET("api/persons")
     Call<List<Personne>> getPersons();
+
+    @GET("api/person/search")
+    Call<List<Personne>> searchPerson(@Query("keyword") String keyword);
 
     @GET("api/person/{id}/friendswithme")
     Call<List<FriendWithMe>> getPersonFriendsWithMe(@Path("id") Integer id);
