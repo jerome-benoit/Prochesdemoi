@@ -19,7 +19,7 @@ class RetrofitClient {
 
     private RetrofitClient() {
         gson = new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
                 .create();
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
