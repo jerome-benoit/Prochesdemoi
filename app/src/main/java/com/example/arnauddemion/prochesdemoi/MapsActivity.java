@@ -91,13 +91,8 @@ public class MapsActivity extends AppCompatActivity
             //TODO: move this code in a displayFriends method of CurrentUser
             for (Personne friend : User.getFriends()) {
                 if (friend.getLocation() != null) {
-                    Date now = new Date(Calendar.getInstance().getTime().getTime());
-                    Date timeStamp = friend.getLocation().getTimestamp();
-                    Log.d(TAG, "time " + (now.getTime()-timeStamp.getTime())/1000);
-                    if ((now.getTime()-timeStamp.getTime())<mInterval) {
-                        LatLng latLng = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
-                        drawCircle(latLng, User.getLocationLatLng(), friend.getFullname());
-                    }
+                    LatLng latLng = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
+                    drawCircle(latLng, User.getLocationLatLng(), friend.getFullname());
                 } else {
                     Log.d(TAG, "Friend " + friend.getId() + " has no location(s) yet, not displaying");
                 }
