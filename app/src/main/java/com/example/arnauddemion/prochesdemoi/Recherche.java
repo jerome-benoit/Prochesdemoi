@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Recherche extends Activity {
     private final String TAG = getClass().getSimpleName();
@@ -28,10 +29,13 @@ public class Recherche extends Activity {
 
         persons = new ArrayList<String>();
 
-        User.fetchPersons();
+        List<Personne> searchList = User.searchPersons("isabelle");
+
         //TODO: create a button add for each friend
-        for (Personne personne : User.getPersons()) {
-            persons.add(personne.getFullname());
+        if (searchList != null) {
+            for (Personne personne : searchList) {
+                persons.add(personne.getFullname());
+            }
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
