@@ -23,6 +23,7 @@ class CurrentUser extends Personne {
     private RESTService APIService = RetrofitClient.getInstance().getAPI();
     private List<Personne> friends;
     private List<Personne> persons;
+    private List<Personne> searchList;
 
     // Boolean private variable for tricky method that need boolean return value.
     private static boolean rtVal;
@@ -233,5 +234,22 @@ class CurrentUser extends Personne {
                 Log.e(TAG, throwable.toString());
             }
         });
+    }
+
+    public List<Personne> searchPersons(String keyword) {
+        Call<List<Personne>> call = APIService.searchPerson(keyword);
+        call.enqueue(new Callback<List<Personne>>() {
+            @Override
+            public void onResponse(Call<List<Personne>> call, Response<List<Personne>> response) {
+                searchList = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<List<Personne>> call, Throwable throwable) {
+                Log.e(TAG, "All persons for person " + getId() + " REST resource call failure");
+                Log.e(TAG, throwable.toString());
+            }
+        });
+        return searchList;
     }
 }
