@@ -130,8 +130,8 @@ class CurrentUser extends Personne {
         return new Date(timestamp);
     }
     
-    public void updateLocation(double latitude, double longitude, long timestamp) {
-        setLocation(new MyLocation(latitude, longitude, timestampToDate(timestamp)));
+    public void updateLocation(double latitude, double longitude, Date timestamp) {
+        setLocation(new MyLocation(latitude, longitude, timestamp));
         Call<ResponseBody> call = APIService.updatePersonLocation(getId(), getLocation());
         call.enqueue(new Callback<ResponseBody>() {
             @Override
