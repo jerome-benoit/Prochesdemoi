@@ -29,7 +29,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DecimalFormat;
-import java.util.Date;
+import java.sql.Date;
+import java.util.Calendar;
 
 public class MapsActivity extends AppCompatActivity
         implements
@@ -295,7 +296,9 @@ public class MapsActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(final Location location) {
-        User.updateLocation(location.getLatitude(), location.getLongitude(), location.getTime());
+        // Workaround an Android bug
+        Date now = new Date(Calendar.getInstance().getTime().getTime());
+        User.updateLocation(location.getLatitude(), location.getLongitude(), now);
     }
 
     @Override
