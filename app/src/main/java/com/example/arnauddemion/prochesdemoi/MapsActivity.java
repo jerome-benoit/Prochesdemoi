@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 
 public class MapsActivity extends AppCompatActivity
         implements
@@ -89,8 +90,13 @@ public class MapsActivity extends AppCompatActivity
             //TODO: move this code in a displayFriends method of CurrentUser
             for (Personne friend : User.getFriends()) {
                 if (friend.getLocation() != null) {
-                    LatLng latLng = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
-                    drawCircle(latLng, User.getLocationLatLng(), friend.getFullname());
+                    Date now = new Date();
+                    Date timeStamp = friend.getLocation().getTimestamp();
+                    Log.d(TAG, "time " + (now.getTime()-timeStamp.getTime())/1000);
+                    if ((now.getTime()-timeStamp.getTime())<6000) {
+                        LatLng latLng = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
+                        drawCircle(latLng, User.getLocationLatLng(), friend.getFullname());
+                    }
                 } else {
                     Log.d(TAG, "Friend " + friend.getId() + " has no location(s) yet, not displaying");
                 }
@@ -158,6 +164,7 @@ public class MapsActivity extends AppCompatActivity
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
+
     }
 
     private void drawCircle(LatLng latLng, LatLng latLngb, String fullname) {
@@ -269,7 +276,7 @@ public class MapsActivity extends AppCompatActivity
      * Method allowing to subscribe from GPS data
      */
     public void abonnementGPS() {
-        //On s'abonne
+        // GPS subscription
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -287,7 +294,7 @@ public class MapsActivity extends AppCompatActivity
      * Method allowing to unsubscribe from GPS data
      */
     public void desabonnementGPS() {
-        // GPS subscription if available
+        // GPS unsubscription
         locationManager.removeUpdates(this);
     }
 
