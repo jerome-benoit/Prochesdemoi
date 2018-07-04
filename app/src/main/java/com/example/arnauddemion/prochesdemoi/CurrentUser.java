@@ -52,7 +52,8 @@ class CurrentUser extends Personne {
     }
 
     public List<Personne> getNearFriends() {
-        //TODO: Add time criterion?
+        //TODO: Do it
+        //      Add time criterion?
         return friends;
     }
 
@@ -230,7 +231,7 @@ class CurrentUser extends Personne {
 
             @Override
             public void onFailure(Call<List<Personne>> call, Throwable throwable) {
-                Log.e(TAG, "All persons for person " + getId() + " REST resource call failure");
+                Log.e(TAG, "All persons REST resource call failure");
                 Log.e(TAG, throwable.toString());
             }
         });
@@ -246,7 +247,7 @@ class CurrentUser extends Personne {
 
             @Override
             public void onFailure(Call<List<Personne>> call, Throwable throwable) {
-                Log.e(TAG, "All persons for person " + getId() + " REST resource call failure");
+                Log.e(TAG, "Search person REST resource call failure");
                 Log.e(TAG, throwable.toString());
             }
         });
