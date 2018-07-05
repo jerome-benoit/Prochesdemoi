@@ -43,10 +43,8 @@ public class Recherche extends AppCompatActivity {
 
         User.fetchPersons();
         //TODO: create a button unfriend for each friend
-        if (User.getPersons() != null) {
-            for (Personne personne : User.getPersons()) {
-                persons.add(personne.getFullname());
-            }
+        for (Personne personne : User.getPersons()) {
+            persons.add(personne.getFullname());
         }
 
         editText.addTextChangedListener(new TextWatcher() {
