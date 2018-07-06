@@ -28,7 +28,6 @@ public class Amis extends Activity {
 
         persons = new ArrayList<String>();
 
-        User.fetchFriends();
         //TODO: move this code in a displayFriends method of CurrentUser
         //TODO: create a button unfriend for each friend
         for (Personne friend : User.getFriends()) {

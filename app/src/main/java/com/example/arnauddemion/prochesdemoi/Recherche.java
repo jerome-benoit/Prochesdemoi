@@ -33,19 +33,19 @@ public class Recherche extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recherche);
 
-        myList = findViewById(android.R.id.list);
+        ListView myList = findViewById(android.R.id.list);
 
-        editText = (EditText) findViewById(R.id.editText);
+        EditText editText = findViewById(R.id.editText);
 
         persons = new ArrayList<String>();
-
-        adapter = new ArrayAdapter<String>(this, R.layout.list_item, R.id.friend_name, persons);
 
         User.fetchPersons();
         //TODO: create a button unfriend for each friend
         for (Personne personne : User.getPersons()) {
             persons.add(personne.getFullname());
         }
+
+        adapter = new ArrayAdapter<String>(this, R.layout.list_item, R.id.friend_name, persons);
 
         editText.addTextChangedListener(new TextWatcher() {
 
