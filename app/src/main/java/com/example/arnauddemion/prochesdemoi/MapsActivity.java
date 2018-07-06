@@ -92,7 +92,7 @@ public class MapsActivity extends AppCompatActivity
             for (Personne friend : User.getFriends()) {
                 if (friend.getLocation() != null) {
                     LatLng latLng = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
-                    if (User.distanceCalculation(latLng, User.getLocationLatLng()) < 2) {
+                    if (User.distanceCalculation(latLng, User.getLocationLatLng()) < User.getNearDistance()) {
                         drawCircle(latLng, User.getLocationLatLng(), friend.getFullname());
                     }
                 } else {
