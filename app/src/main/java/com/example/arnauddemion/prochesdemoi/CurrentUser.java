@@ -18,7 +18,7 @@ import retrofit2.Response;
 class CurrentUser extends Personne {
     private static final CurrentUser ourInstance = new CurrentUser();
     private static final Integer fuzzyDistance = 300;
-    private static final Integer nearDistance= 2000;
+    private static final Integer nearDistance= 2;
     private final String TAG = getClass().getSimpleName();
     private RESTService APIService = RetrofitClient.getInstance().getAPI();
     private List<Personne> friends;
@@ -59,6 +59,10 @@ class CurrentUser extends Personne {
 
     public static Integer getFuzzyDistance() {
         return fuzzyDistance;
+    }
+
+    public static Integer getNearDistance() {
+        return nearDistance;
     }
 
     public double distanceCalculation(LatLng StartP, LatLng EndP) {
