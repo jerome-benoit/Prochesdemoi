@@ -1,8 +1,7 @@
 package com.example.arnauddemion.prochesdemoi;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
@@ -11,7 +10,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Recherche extends AppCompatActivity {
     private final String TAG = getClass().getSimpleName();
