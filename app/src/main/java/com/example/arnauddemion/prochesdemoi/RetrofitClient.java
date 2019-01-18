@@ -13,10 +13,6 @@ class RetrofitClient {
     private static Gson gson;
     private static RESTService API = null;
 
-    static RetrofitClient getInstance() {
-        return ourInstance;
-    }
-
     private RetrofitClient() {
         gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -28,8 +24,12 @@ class RetrofitClient {
         API = retrofit.create(RESTService.class);
     }
 
+    static RetrofitClient getInstance() {
+        return ourInstance;
+    }
+
     public RESTService getAPI() {
-        if (API == null)  {
+        if (API == null) {
             API = retrofit.create(RESTService.class);
         }
         return API;

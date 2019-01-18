@@ -6,9 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".Amis">
 
-    <ListView android:id="@android:id/list"
+    <ListView
+        android:id="@android:id/list"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-    </ListView>
+        android:layout_height="wrap_content"></ListView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,27 +18,27 @@ public class MyLocation {
         this.timestamp = timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
     public double getLatitude() {
         return latitude;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 
     public double getLongitude() {
         return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }

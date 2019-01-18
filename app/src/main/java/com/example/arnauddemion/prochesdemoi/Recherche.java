@@ -1,7 +1,9 @@
 package com.example.arnauddemion.prochesdemoi;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
@@ -54,12 +56,12 @@ public class Recherche extends AppCompatActivity {
 
             @Override
             public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-                Toast.makeText(getApplicationContext(),"before text change",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "before text change", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void afterTextChanged(Editable arg0) {
-                Toast.makeText(getApplicationContext(),"after text change",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "after text change", Toast.LENGTH_LONG).show();
             }
         });
 

@@ -39,19 +39,16 @@ public class MapsActivity extends AppCompatActivity
         OnMyLocationClickListener,
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
-    private final String TAG = getClass().getSimpleName();
-    CurrentUser User = CurrentUser.getInstance();
-
-    private final int mInterval = 6000; // 6 seconds by default, can be changed later. Should be a little randomized.
-    private Handler mHandler;
-
     /**
      * Request code for location permission request.
      *
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-
+    private final String TAG = getClass().getSimpleName();
+    private final int mInterval = 6000; // 6 seconds by default, can be changed later. Should be a little randomized.
+    CurrentUser User = CurrentUser.getInstance();
+    private Handler mHandler;
     /**
      * Flag indicating whether a requested permission has been denied after returning in
      * {@link #onRequestPermissionsResult(int, String[], int[])}.

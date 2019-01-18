@@ -3,11 +3,13 @@ package com.example.arnauddemion.prochesdemoi;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;

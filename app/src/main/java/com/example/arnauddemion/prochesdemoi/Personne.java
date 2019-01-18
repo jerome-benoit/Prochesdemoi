@@ -69,12 +69,12 @@ public class Personne {
         return location;
     }
 
-    public LatLng getLocationLatLng() {
-        return new LatLng(getLocation().getLatitude(), getLocation().getLongitude());
-    }
-
     public void setLocation(MyLocation location) {
         this.location = location;
+    }
+
+    public LatLng getLocationLatLng() {
+        return new LatLng(getLocation().getLatitude(), getLocation().getLongitude());
     }
 
     public boolean getOnline() {

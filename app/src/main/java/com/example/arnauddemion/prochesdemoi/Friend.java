@@ -12,12 +12,12 @@ public class Friend {
         this.friend = person;
     }
 
-    public void setIs_valid(boolean is_valid) {
-        this.is_valid = is_valid;
-    }
-
     public boolean getIs_valid() {
         return is_valid;
+    }
+
+    public void setIs_valid(boolean is_valid) {
+        this.is_valid = is_valid;
     }
 
 }

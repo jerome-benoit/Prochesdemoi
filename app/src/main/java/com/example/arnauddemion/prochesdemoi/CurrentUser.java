@@ -18,23 +18,30 @@ import retrofit2.Response;
 class CurrentUser extends Personne {
     private static final CurrentUser ourInstance = new CurrentUser();
     private static final Integer fuzzyDistance = 300;
-    private static final Integer nearDistance= 2;
+    private static final Integer nearDistance = 2;
+    // Boolean private variable for tricky method that need boolean return value.
+    private static boolean rtVal;
     private final String TAG = getClass().getSimpleName();
     private RESTService APIService = RetrofitClient.getInstance().getAPI();
     private List<Personne> friends;
     private List<Personne> persons;
     private List<Personne> searchList;
 
-    // Boolean private variable for tricky method that need boolean return value.
-    private static boolean rtVal;
+    private CurrentUser() {
+        friends = new ArrayList<>();
+        persons = new ArrayList<>();
+    }
 
     static CurrentUser getInstance() {
         return ourInstance;
     }
 
-    private CurrentUser() {
-        friends = new ArrayList<>();
-        persons = new ArrayList<>();
+    public static Integer getFuzzyDistance() {
+        return fuzzyDistance;
+    }
+
+    public static Integer getNearDistance() {
+        return nearDistance;
     }
 
     public List<Personne> getPersons() {
@@ -55,14 +62,6 @@ class CurrentUser extends Personne {
         //TODO: Do it
         //      Add time criterion?
         return friends;
-    }
-
-    public static Integer getFuzzyDistance() {
-        return fuzzyDistance;
-    }
-
-    public static Integer getNearDistance() {
-        return nearDistance;
     }
 
     public double distanceCalculation(LatLng StartP, LatLng EndP) {
@@ -86,8 +85,7 @@ class CurrentUser extends Personne {
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("SHA-256");
-        }
-        catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         //FIXME: Make use of a salt
@@ -131,10 +129,10 @@ class CurrentUser extends Personne {
         return rtVal;
     }
 
-    private Date timestampToDate(long timestamp){
+    private Date timestampToDate(long timestamp) {
         return new Date(timestamp);
     }
-    
+
     public void updateLocation(double latitude, double longitude, Date timestamp) {
         setLocation(new MyLocation(latitude, longitude, timestamp));
         Call<ResponseBody> call = APIService.updatePersonLocation(getId(), getLocation());
